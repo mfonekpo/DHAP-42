@@ -1,0 +1,19 @@
+services:
+  minio:
+    image: quay.io/minio/aistor/minio:latest
+    container_name: minio
+    ports:
+      - 9000:9000
+      - 9001:9001 #for minio console
+    env_file:
+      - "../../.env"
+    volumes:
+      - ./minio_data:/data
+      - ./minio.license:/minio.license:ro
+
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    command: server /data --console-address ":9001"
