@@ -1,2 +1,5 @@
 *.env
 venv
+containers/airflow/config
+containers/airflow/logs
+containers/airflow/plugins
