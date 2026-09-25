@@ -3,4 +3,5 @@ venv
 containers/airflow/config
 containers/airflow/logs
 containers/airflow/plugins
+containers/minio/minio_data/
 *.license
