@@ -290,3 +290,9 @@ services:
 
 volumes:
   postgres-db-volume:
+
+networks:
+  default:
+    name: dhap42
+    external: true
+      
