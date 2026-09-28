@@ -1,0 +1,29 @@
+dataset: email_thread_summary_dataset
+version: 1
+
+allow_extra_columns: false
+
+columns:
+  - name: thread_id
+    type: integer
+    nullable: false
+
+  - name: subject
+    type: string
+    nullable: true
+
+  - name: timestamp
+    type: datetime
+    nullable: false
+
+  - name: from
+    type: string
+    nullable: false
+
+  - name: to
+    type: string
+    nullable: false
+
+  - name: body
+    type: string
+    nullable: true

@@ -17,3 +17,25 @@ services:
       timeout: 5s
       retries: 3
     command: server /data --console-address ":9001"
+
+  minio_bucket-init:
+    image: quay.io/minio/aistor/mc:RELEASE.2026-02-07T19-37-38Z
+    env_file:
+      - "../../.env"
+    environment:
+      MINIO_BUCKET: "${MINIO_BUCKET:?Set MINIO_BUCKET in .env}"
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        mc alias set storage http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        mc mb --ignore-existing "storage/$${MINIO_BUCKET}"
+        echo "Bucket ready: $${MINIO_BUCKET}"
+    restart: "no"
+
+networks:
+  default:
+    name: dhap42
+    external: true

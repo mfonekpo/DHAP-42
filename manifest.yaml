@@ -1,0 +1,14 @@
+dataset: email_thread_summary_dataset
+version: 1
+owner: mfonekpo
+
+description: Email message details for the CSV-to-Parquet pipeline.
+status: draft
+
+source:
+  system: SharePoint
+  format: csv
+  path: dataset/email_thread_details.csv
+  encoding: utf-8-sig
+
+schema_path: schema_contract.yaml
