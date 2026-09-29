@@ -1,4 +1,4 @@
-FROM apache/airflow:3.3.0
+FROM apache/airflow:3.3.2
 
 # copy only the requirements.txt file to leverage Docker cache
 COPY requirements.txt /requirements.txt

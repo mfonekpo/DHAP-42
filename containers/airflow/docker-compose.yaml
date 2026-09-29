@@ -10,6 +10,7 @@ x-airflow-common:
     - ${ENV_FILE_PATH:-../../.env}
   environment:
     &airflow-common-env
+    PYTHONPATH: /opt/dhap42
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -36,6 +37,13 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+
+    - ../../dataset:/opt/dhap42/dataset:ro
+    - ../../etl:/opt/dhap42/etl:ro
+    - ../../utils:/opt/dhap42/utils:ro
+    - ../../manifest.yaml:/opt/dhap42/manifest.yaml:ro
+    - ../../schema_contract.yaml:/opt/dhap42/schema_contract.yaml:ro
+
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
