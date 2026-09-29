@@ -4,7 +4,7 @@ import pandas as pd
 
 
 @task(
-    retries=3
+    retries=2
 )
 def extract():
     from etl.extract import read_data
@@ -12,11 +12,11 @@ def extract():
 
 
 @task(
-    retries=3
+    retries=2
 )
-def check_read_data(dataframe: pd.DataFrame):
-    print(dataframe)
-    # return read_data
+def validate(dataframe):
+    from etl.validate import validate_contract
+    return validate_contract(dataframe)
 
 
 @dag(
@@ -28,7 +28,7 @@ def check_read_data(dataframe: pd.DataFrame):
 )
 def dhap42():
     dataframe = extract()
-    check_read_data(dataframe)
+    validate(dataframe)
 
 
 dhap42()
