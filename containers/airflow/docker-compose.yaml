@@ -10,6 +10,7 @@ x-airflow-common:
     - ${ENV_FILE_PATH:-../../.env}
   environment:
     &airflow-common-env
+    PYTHONPATH: /opt/dhap42
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -21,6 +22,11 @@ x-airflow-common:
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
     AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET:-airflow_jwt_secret}
     AIRFLOW__API_AUTH__JWT_ISSUER: ${AIRFLOW__API_AUTH__JWT_ISSUER:-airflow}
+
+    AIRFLOW__CORE__XCOM_BACKEND: airflow.providers.common.io.xcom.backend.XComObjectStorageBackend
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_PATH: s3://minio_s3@dhap42-xcom/xcom
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_THRESHOLD: "1048576"
+    AIRFLOW__COMMON_IO__XCOM_OBJECTSTORAGE_COMPRESSION: gzip
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
@@ -36,6 +42,13 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+
+    - ../../dataset:/opt/dhap42/dataset:ro
+    - ../../etl:/opt/dhap42/etl:ro
+    - ../../utils:/opt/dhap42/utils:ro
+    - ../../manifest.yaml:/opt/dhap42/manifest.yaml:ro
+    - ../../schema_contract.yaml:/opt/dhap42/schema_contract.yaml:ro
+
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
