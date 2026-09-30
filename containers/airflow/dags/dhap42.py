@@ -1,6 +1,6 @@
+import pandas as pd
 from airflow.sdk import task, dag
 import pendulum
-import pandas as pd
 
 
 @task(
@@ -27,6 +27,15 @@ def transform(
     from etl.transform import transform_data
     return transform_data(validated_dataframe)
 
+@task(
+    retries=2
+)
+def load(
+    dataframe: pd.DataFrame,
+):
+    from etl.load import load_to_minio
+    return load_to_minio(dataframe)
+
 @dag(
     schedule=None,
     start_date=pendulum.datetime(2026, 9, 29, tz="UTC"),
@@ -37,7 +46,7 @@ def transform(
 def dhap42():
     extracted_dataframe = extract()
     validated_dataframe = validate(extracted_dataframe)
-    transform(validated_dataframe)
-
+    transformed_dataframe = transform(validated_dataframe)
+    load(transformed_dataframe)
 
 dhap42()
