@@ -7,7 +7,7 @@ import pandas as pd
     retries=2
 )
 def extract():
-    from etl.extract import read_data
+    from etl.extract import read_data #avoid top level code
     return read_data()
 
 
@@ -18,6 +18,14 @@ def validate(dataframe):
     from etl.validate import validate_contract
     return validate_contract(dataframe)
 
+@task(
+    retries=2
+)
+def transform(
+    validated_dataframe
+):
+    from etl.transform import transform_data
+    return transform_data(validated_dataframe)
 
 @dag(
     schedule=None,
@@ -27,8 +35,9 @@ def validate(dataframe):
     max_active_runs=3,
 )
 def dhap42():
-    dataframe = extract()
-    validate(dataframe)
+    extracted_dataframe = extract()
+    validated_dataframe = validate(extracted_dataframe)
+    transform(validated_dataframe)
 
 
 dhap42()
