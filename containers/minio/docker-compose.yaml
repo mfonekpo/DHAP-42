@@ -32,6 +32,7 @@ services:
       - |
         mc alias set storage http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
         mc mb --ignore-existing "storage/$${MINIO_BUCKET}"
+        mc mb --ignore-existing "storage/dhap42-xcom"
         echo "Bucket ready: $${MINIO_BUCKET}"
     restart: "no"
 

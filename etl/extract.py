@@ -3,10 +3,14 @@ from pathlib import Path
 from utils.logging_config import logger
 import yaml
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MANIFEST_PATH = PROJECT_ROOT / "manifest.yaml"
 
 
-def read_manifest():
-    manifest_file_path = Path("manifest.yaml").resolve()
+def read_manifest(
+    manifest_path: Path = DEFAULT_MANIFEST_PATH
+)-> dict:
+    manifest_file_path = Path(manifest_path).resolve()
     if not manifest_file_path.exists():
         logger.error(f"Manifest file not found at {manifest_file_path}")
         raise FileNotFoundError(f"Manifest file not found at {manifest_file_path}")
@@ -18,11 +22,20 @@ def read_manifest():
         logger.error("Manifest file is not a dictionary")
         raise TypeError("Manifest file is not a dictionary")
 
-    file_format = manifest.get("source", {}).get("format")
-    file_path = manifest.get("source", {}).get("file_path")
+    source = manifest.get("source", {})
+    file_format = source.get("format")
+
+    file_path = Path(source["file_path"])
+
+    if not file_path.is_absolute():
+        file_path = manifest_file_path.parent / file_path
+
+    file_path = file_path.resolve()
+    manifest["source"]["file_path"] = str(file_path)
+
 
     # check if format matches file format
-    if file_format not in Path(file_path).suffix:
+    if file_format not in file_path.suffix:
         logger.error(f"File format {file_format} does not match file extension {Path(file_path).suffix}")
         raise ValueError(f"File format {file_format} does not match file extension {Path(file_path).suffix}")
 
@@ -35,8 +48,10 @@ def read_manifest():
     return manifest
 
 
-def read_data():
-    manifest = read_manifest()
+def read_data(
+        manifest_path: str | Path = DEFAULT_MANIFEST_PATH,
+) -> pd.DataFrame:
+    manifest = read_manifest(manifest_path)
     datafile = manifest.get("source", {}).get("file_path")
     encoding = manifest.get("source", {}).get("encoding")
     df = pd.read_csv(
