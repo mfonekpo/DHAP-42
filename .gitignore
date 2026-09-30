@@ -8,3 +8,4 @@ containers/minio/minio_data/
 __pycache__
 *.pyc
 logs/
+dataset/
