@@ -6,12 +6,19 @@ from etl.extract import read_data
 import pandas as pd
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MANIFEST_PATH = PROJECT_ROOT / "manifest.yaml"
+DEFAULT_CONTRACT_PATH = PROJECT_ROOT / "schema_contract.yaml"
+
+
 class ContractValidationError(ValueError):
     """Raised when the contract or dataset fails validation."""
 
 
-def _read_contract():
-    contract_file_path = Path("schema_contract.yaml").resolve()
+def _read_contract(
+    contract_file_path: Path = DEFAULT_CONTRACT_PATH
+)-> dict:
+
     if not contract_file_path.exists():
         logger.error(f"schema_contract file not found at {contract_file_path}")
         raise ContractValidationError(f"schema_contract file not found at {contract_file_path}")
@@ -67,7 +74,10 @@ def _parse_integer(value):
     return number
 
 
-def validate_contract(frame, contract_path: str | Path):
+def validate_contract(
+    frame: pd.DataFrame,
+    contract_path: Path = DEFAULT_CONTRACT_PATH
+):
     """Return a typed copy of the raw-text DataFrame, or raise on failure.
 
     All declared columns are required. Nulls and blank/whitespace-only strings
@@ -144,5 +154,5 @@ def validate_contract(frame, contract_path: str | Path):
     return validated
 
 
-if __name__ == "__main__":
-    validate_contract(read_data(), "schema_contract.yaml")
+# if __name__ == "__main__":
+#     validate_contract(read_data(), "schema_contract.yaml")

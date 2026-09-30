@@ -3,18 +3,24 @@ import pandas as pd
 from pandas.api.types import is_datetime64_any_dtype
 from etl.extract import read_data
 from etl.validate import validate_contract
+from pathlib import Path
+import copy
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MANIFEST_PATH = PROJECT_ROOT / "manifest.yaml"
+DEFAULT_CONTRACT_PATH = PROJECT_ROOT / "schema_contract.yaml"
 
 
-def transform_data():
+def transform_data(
+        validated_dataframe: pd.DataFrame,
+):
     """Return a copy with message_month (YYYY-MM) derived from timestamp.
 
     Call validate_contract first. Preserve the existing timestamp timezone,
     row order, index and source values; do not deduplicate email threads.
     """
 
-    extracted = read_data()
-    validated = validate_contract(extracted, "schema_contract.yaml")
-    dataframe = validated
+    dataframe = copy.deepcopy(validated_dataframe)
 
     if not isinstance(dataframe, pd.DataFrame):
         raise TypeError("dataframe must be a pandas Datadataframe")
@@ -31,6 +37,7 @@ def transform_data():
     if timestamps.isna().any():
         raise ValueError("timestamp cannot contain missing values for partitioning")
 
+    # Partition by month
     transformed = dataframe.copy(deep=True)
     transformed["message_month"] = timestamps.dt.strftime("%Y-%m").astype("string")
 
