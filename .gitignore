@@ -5,3 +5,6 @@ containers/airflow/logs
 containers/airflow/plugins
 containers/minio/minio_data/
 *.license
+__pycache__
+*.pyc
+logs/
