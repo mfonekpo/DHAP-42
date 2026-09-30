@@ -6,9 +6,12 @@ import pandas as pd
 from pandas.api.types import is_datetime64_any_dtype
 from airflow.providers.amazon.aws.hooks.s3 import S3Hook
 import os
-
 from etl.extract import read_manifest
 from etl.transform import transform_data
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MANIFEST_PATH = PROJECT_ROOT / "manifest.yaml"
+DEFAULT_CONTRACT_PATH = PROJECT_ROOT / "schema_contract.yaml"
 
 def load_to_minio(
     frame,
